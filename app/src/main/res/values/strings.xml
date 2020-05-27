@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">CarSharing</string>
+    <string name="login_with_email">Email Login</string>
+    <string name="login_with_google">Google Login</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="login">Login</string>
+    <string name="create_acc_text">Create an account here..</string>
+    <string name="register">Register</string>
 </resources>
