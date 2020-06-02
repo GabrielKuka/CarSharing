@@ -1,5 +1,6 @@
 package com.car.sharing.ui.fragments
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -9,7 +10,9 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import com.car.sharing.R
+import com.car.sharing.ui.activities.Home
 import com.car.sharing.viewmodels.AuthViewModel
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.android.synthetic.main.fragment_choose_auth.*
 
 
@@ -21,9 +24,18 @@ class ChooseAuth : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        authViewModel = activity?.run {
+
+        val user = FirebaseAuth.getInstance().currentUser
+
+        if (user != null) {
+            // User is logged in
+            startActivity(Intent(requireActivity(), Home::class.java))
+            return
+        }
+
+        authViewModel = requireActivity().run {
             ViewModelProviders.of(this).get(AuthViewModel::class.java)
-        }!!
+        }
 
     }
 

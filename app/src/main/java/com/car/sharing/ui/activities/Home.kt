@@ -1,12 +1,8 @@
 package com.car.sharing.ui.activities
 
-import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
 import com.car.sharing.R
-import com.google.firebase.auth.FirebaseAuth
-import com.meet.quicktoast.Quicktoast
-import kotlinx.android.synthetic.main.authentication.*
 import kotlinx.android.synthetic.main.home_activity.*
 
 class Home : AppCompatActivity() {
@@ -16,5 +12,8 @@ class Home : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.home_activity)
 
+        logout_button.setOnClickListener {
+
+        }
     }
 }
