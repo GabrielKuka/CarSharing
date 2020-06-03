@@ -11,8 +11,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ui.activities.Home"></activity>
-        <activity android:name=".ui.activities.Authentication">
+        <activity android:name=".ui.activities.Home" />
+        <activity
+            android:name=".ui.activities.Authentication"
+            android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

@@ -24,7 +24,6 @@ class ChooseAuth : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-
         val user = FirebaseAuth.getInstance().currentUser
 
         if (user != null && user.isEmailVerified) {
@@ -60,5 +59,6 @@ class ChooseAuth : Fragment() {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_choose_auth, container, false)
     }
+
 
 }

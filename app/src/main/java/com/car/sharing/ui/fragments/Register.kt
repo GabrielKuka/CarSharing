@@ -15,12 +15,14 @@ import com.car.sharing.viewmodels.AuthViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.meet.quicktoast.Quicktoast
 import kotlinx.android.synthetic.main.fragment_register.*
+import org.imaginativeworld.oopsnointernet.NoInternetDialog
 
 class Register : Fragment() {
 
     private lateinit var authViewModel: AuthViewModel
     private lateinit var firebaseAuth: FirebaseAuth
     private lateinit var navController: NavController
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -87,7 +89,9 @@ class Register : Fragment() {
 
     }
 
+
     private fun showTextDialog(msg: String) {
         TextDialog(msg).show(requireActivity().supportFragmentManager, "")
     }
+
 }

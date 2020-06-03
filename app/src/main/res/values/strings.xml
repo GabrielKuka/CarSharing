@@ -8,4 +8,7 @@
     <string name="login">Login</string>
     <string name="create_acc_text">Create an account here..</string>
     <string name="register">Register</string>
+
+    <string name="no_internet">No Internet Connection</string>
+    <string name="airplane_mode">Airplane Mode On</string>
 </resources>

@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
 import com.car.sharing.R
@@ -14,6 +15,7 @@ import com.car.sharing.viewmodels.AuthViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.meet.quicktoast.Quicktoast
 import kotlinx.android.synthetic.main.fragment_login.*
+import org.imaginativeworld.oopsnointernet.NoInternetDialog
 
 
 class LogInFragment : Fragment() {
@@ -24,6 +26,7 @@ class LogInFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         arguments?.let {
             email = it.getString("email").toString()
         }
@@ -39,6 +42,11 @@ class LogInFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+
+        requireActivity().window
+            .setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE or WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
+
+
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_login, container, false)
     }
@@ -46,8 +54,11 @@ class LogInFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        email_field.requestFocus()
+
         if (email.isNotEmpty()) {
             email_field.setText(email)
+            pass_field.requestFocus()
         }
 
         login_button.setOnClickListener {
@@ -79,6 +90,7 @@ class LogInFragment : Fragment() {
         }
 
     }
+
 
     private fun showTextDialog(msg: String) {
         TextDialog(msg).show(requireActivity().supportFragmentManager, "")
