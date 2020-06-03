@@ -10,6 +10,7 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import com.car.sharing.R
+import com.car.sharing.ui.dialogs.TextDialog
 import com.car.sharing.viewmodels.AuthViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.meet.quicktoast.Quicktoast
@@ -61,28 +62,32 @@ class Register : Fragment() {
                 .addOnCanceledListener {
                     Quicktoast(requireActivity()).swarn("Registration Canceled.")
                 }.addOnCompleteListener {
-                if (!it.isSuccessful) {
-                    Quicktoast(requireActivity()).swarn("Registration failed.")
-                    return@addOnCompleteListener
-                }
-
-                val user = firebaseAuth.currentUser
-                user?.sendEmailVerification()?.addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        Quicktoast(requireActivity()).sinfo("Verification Email Sent.")
-
-                        val bundle = bundleOf("email" to emailField)
-                        navController.navigate(R.id.action_register_to_logInFragment, bundle)
-
-                    } else {
-                        Quicktoast(requireActivity()).swarn("Failed to send email.")
+                    if (!it.isSuccessful) {
+                        Quicktoast(requireActivity()).swarn("Registration failed.")
+                        return@addOnCompleteListener
                     }
 
+                    val user = firebaseAuth.currentUser
+                    user?.sendEmailVerification()?.addOnCompleteListener { task ->
+                        if (task.isSuccessful) {
+                            showTextDialog("An email has been sent to the address provided. Check that email to verify your account")
+
+                            val bundle = bundleOf("email" to emailField)
+                            navController.navigate(R.id.action_register_to_logInFragment, bundle)
+
+                        } else {
+                            Quicktoast(requireActivity()).swarn("Failed to send email.")
+                        }
+
+                    }
                 }
-            }
 
         }
 
+
     }
 
+    private fun showTextDialog(msg: String) {
+        TextDialog(msg).show(requireActivity().supportFragmentManager, "")
+    }
 }

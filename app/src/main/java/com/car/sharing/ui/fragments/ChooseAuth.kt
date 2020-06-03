@@ -27,7 +27,7 @@ class ChooseAuth : Fragment() {
 
         val user = FirebaseAuth.getInstance().currentUser
 
-        if (user != null) {
+        if (user != null && user.isEmailVerified) {
             // User is logged in
             startActivity(Intent(requireActivity(), Home::class.java))
             return

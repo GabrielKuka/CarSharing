@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
 import com.car.sharing.R
 import com.car.sharing.ui.activities.Home
+import com.car.sharing.ui.dialogs.TextDialog
 import com.car.sharing.viewmodels.AuthViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.meet.quicktoast.Quicktoast
@@ -45,7 +46,7 @@ class LogInFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        if (!email.isNullOrEmpty()) {
+        if (email.isNotEmpty()) {
             email_field.setText(email)
         }
 
@@ -62,7 +63,14 @@ class LogInFragment : Fragment() {
                 if (it.isSuccessful) {
                     val user = firebaseAuth.currentUser
                     if (user != null && user.isEmailVerified) {
-                        startActivity(Intent(requireActivity(), Home::class.java))
+
+                        val intent = Intent(requireActivity(), Home::class.java)
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
+
+                        startActivity(intent)
+                    } else {
+                        showTextDialog("This account is not yet verified. Check your emails to verify it.")
                     }
                 } else {
                     Quicktoast(requireActivity()).swarn(it.exception?.message)
@@ -70,6 +78,10 @@ class LogInFragment : Fragment() {
             }
         }
 
+    }
+
+    private fun showTextDialog(msg: String) {
+        TextDialog(msg).show(requireActivity().supportFragmentManager, "")
     }
 
 
