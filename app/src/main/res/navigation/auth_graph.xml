@@ -27,7 +27,7 @@
     </fragment>
     <fragment
         android:id="@+id/register"
-        android:name="com.car.sharing.ui.fragments.Register"
+        android:name="com.car.sharing.ui.fragments.RegisterFragment"
         android:label="fragment_register"
         tools:layout="@layout/fragment_register">
 

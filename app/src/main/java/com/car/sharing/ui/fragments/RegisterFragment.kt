@@ -1,36 +1,35 @@
 package com.car.sharing.ui.fragments
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.WindowManager
+import androidx.core.os.bundleOf
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.navigation.NavController
+import androidx.navigation.Navigation
 import com.car.sharing.R
-import com.car.sharing.databinding.FragmentLoginBinding
-import com.car.sharing.ui.activities.Home
+import com.car.sharing.databinding.FragmentRegisterBinding
 import com.car.sharing.ui.dialogs.TextDialog
 import com.car.sharing.viewmodels.AuthViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.meet.quicktoast.Quicktoast
-import kotlinx.android.synthetic.main.fragment_login.*
+import kotlinx.android.synthetic.main.fragment_register.*
 
-
-class LogInFragment : Fragment() {
-    private lateinit var binder: FragmentLoginBinding
+class RegisterFragment : Fragment() {
+    private lateinit var binder: FragmentRegisterBinding
     private lateinit var authViewModel: AuthViewModel
     private lateinit var firebaseAuth: FirebaseAuth
-    private var email: String = ""
+    private lateinit var navController: NavController
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         arguments?.let {
-            email = it.getString("email").toString()
+
         }
 
         authViewModel = requireActivity().run {
@@ -38,18 +37,15 @@ class LogInFragment : Fragment() {
         }
 
         firebaseAuth = FirebaseAuth.getInstance()
+
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
+        inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
 
-        requireActivity().window
-            .setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE or WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
-
-        binder = DataBindingUtil.inflate(inflater, R.layout.fragment_login, container, false)
+        binder = DataBindingUtil.inflate(inflater, R.layout.fragment_register, container, false)
 
         return binder.root
     }
@@ -57,18 +53,12 @@ class LogInFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binder.emailField.requestFocus()
-
-        if (email.isNotEmpty()) {
-            binder.emailField.setText(email)
-            binder.passField.requestFocus()
-        }
+        navController = Navigation.findNavController(view)
 
         initObservers()
 
-        binder.loginButton.setOnClickListener {
-
-            logInWithEmail()
+        register_button.setOnClickListener {
+            registerAccount()
         }
 
     }
@@ -79,7 +69,7 @@ class LogInFragment : Fragment() {
         })
     }
 
-    private fun logInWithEmail() {
+    private fun registerAccount() {
         val emailField = email_field.text.toString().trim()
         val passField = pass_field.text.toString().trim()
 
@@ -87,31 +77,36 @@ class LogInFragment : Fragment() {
             Quicktoast(requireActivity()).swarn("There are empty fields.")
             return
         }
-
         authViewModel.setLoading()
-        firebaseAuth.signInWithEmailAndPassword(emailField, passField).addOnCompleteListener {
-            if (it.isSuccessful) {
-                val user = firebaseAuth.currentUser
-                if (user != null && user.isEmailVerified) {
-
-                    val intent = Intent(requireActivity(), Home::class.java)
-                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
-
-                    startActivity(intent)
-                } else {
-                    showTextDialog("This account is not yet verified. Check your emails to verify it.")
+        firebaseAuth.createUserWithEmailAndPassword(emailField, passField)
+            .addOnCanceledListener {
+                Quicktoast(requireActivity()).swarn("Registration Canceled.")
+            }.addOnCompleteListener {
+                if (!it.isSuccessful) {
+                    Quicktoast(requireActivity()).swarn("Registration failed.")
+                    return@addOnCompleteListener
                 }
-            } else {
-                Quicktoast(requireActivity()).swarn(it.exception?.message)
+
+                val user = firebaseAuth.currentUser
+                user?.sendEmailVerification()?.addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        showTextDialog("An email has been sent to the address provided. Check that email to verify your account")
+
+                        val bundle = bundleOf("email" to emailField)
+                        navController.navigate(R.id.action_register_to_logInFragment, bundle)
+
+                    } else {
+                        Quicktoast(requireActivity()).swarn("Failed to send email.")
+                    }
+
+                }
+                authViewModel.setLoading()
             }
-            authViewModel.setLoading()
-        }
+
     }
 
     private fun showTextDialog(msg: String) {
         TextDialog(msg).show(requireActivity().supportFragmentManager, "")
     }
-
 
 }
