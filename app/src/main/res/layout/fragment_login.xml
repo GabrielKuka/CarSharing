@@ -31,26 +31,19 @@
 
                 <com.iitr.kaishu.nsidedprogressbar.NSidedProgressBar
                     android:id="@+id/pBar"
-                    android:layout_width="75dp"
-                    android:layout_height="75dp"
+                    style="@style/ProgressBar"
                     android:visibility="@{isLoading ? View.VISIBLE : View.GONE}"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:nsidedProg_baseSpeed="5"
-                    app:nsidedProg_clockwise="true"
-                    app:nsidedProg_primaryColor="@color/colorAccent"
-                    app:nsidedProg_sideCount="4" />
+                    app:layout_constraintTop_toTopOf="parent" />
 
-                <TextView
+                <androidx.appcompat.widget.AppCompatImageView
                     android:id="@+id/textView2"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
                     android:layout_marginTop="120dp"
-                    android:text="@string/login"
-                    android:textSize="25sp"
-                    android:textStyle="bold"
+                    android:src="@drawable/ic_app_icon"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -58,10 +51,12 @@
                 <EditText
                     android:id="@+id/email_field"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="80dp"
+                    android:layout_height="40dp"
+                    android:layout_marginTop="40dp"
+                    android:background="@drawable/text_field"
                     android:ems="10"
                     android:inputType="textEmailAddress"
+                    android:padding="7dp"
                     android:visibility="@{isLoading ? View.GONE : View.VISIBLE}"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -70,10 +65,12 @@
                 <EditText
                     android:id="@+id/pass_field"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="40dp"
                     android:layout_marginTop="32dp"
+                    android:background="@drawable/text_field"
                     android:ems="10"
                     android:inputType="textPassword"
+                    android:padding="7dp"
                     android:visibility="@{isLoading ? View.GONE : View.VISIBLE}"
                     app:layout_constraintEnd_toEndOf="@+id/email_field"
                     app:layout_constraintStart_toStartOf="@+id/email_field"
@@ -81,8 +78,7 @@
 
                 <Button
                     android:id="@+id/login_button"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    style="@style/GreenButton"
                     android:layout_marginTop="45dp"
                     android:text="@string/login"
                     android:visibility="@{isLoading ? View.GONE : View.VISIBLE}"

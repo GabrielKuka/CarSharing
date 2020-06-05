@@ -103,7 +103,7 @@ class LogInFragment : Fragment() {
                     showTextDialog("This account is not yet verified. Check your emails to verify it.")
                 }
             } else {
-                Quicktoast(requireActivity()).swarn(it.exception?.message)
+                it.exception?.message?.let { errorMsg -> showTextDialog(errorMsg) }
             }
             authViewModel.setLoading()
         }

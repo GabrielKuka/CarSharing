@@ -23,17 +23,12 @@
 
             <com.iitr.kaishu.nsidedprogressbar.NSidedProgressBar
                 android:id="@+id/pBar"
-                android:layout_width="75dp"
-                android:layout_height="75dp"
+                style="@style/ProgressBar"
                 android:visibility="@{isLoading ? View.VISIBLE : View.GONE}"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:nsidedProg_baseSpeed="5"
-                app:nsidedProg_clockwise="true"
-                app:nsidedProg_primaryColor="@color/colorAccent"
-                app:nsidedProg_sideCount="4" />
+                app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
                 android:id="@+id/textView2"
@@ -52,8 +47,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="80dp"
+                android:background="@drawable/text_field"
                 android:ems="10"
                 android:inputType="textEmailAddress"
+                android:padding="7dp"
                 android:visibility="@{isLoading ? View.GONE : View.VISIBLE}"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -64,8 +61,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="32dp"
+                android:background="@drawable/text_field"
                 android:ems="10"
                 android:inputType="textPassword"
+                android:padding="7dp"
                 android:visibility="@{isLoading ? View.GONE : View.VISIBLE}"
                 app:layout_constraintEnd_toEndOf="@+id/email_field"
                 app:layout_constraintStart_toStartOf="@+id/email_field"
@@ -73,8 +72,7 @@
 
             <Button
                 android:id="@+id/register_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                style="@style/GreenButton"
                 android:layout_marginTop="45dp"
                 android:text="@string/register"
                 android:visibility="@{isLoading ? View.GONE : View.VISIBLE}"
