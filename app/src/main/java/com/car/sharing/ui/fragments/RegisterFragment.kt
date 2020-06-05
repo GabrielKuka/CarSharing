@@ -55,10 +55,16 @@ class RegisterFragment : Fragment() {
 
         navController = Navigation.findNavController(view)
 
+        binder.emailField.requestFocus()
+
         initObservers()
 
-        register_button.setOnClickListener {
+        binder.registerButton.setOnClickListener {
             registerAccount()
+        }
+
+        binder.alreadyUser.setOnClickListener {
+            navController.navigate(R.id.action_register_to_logInFragment)
         }
 
     }
@@ -84,6 +90,7 @@ class RegisterFragment : Fragment() {
             }.addOnCompleteListener {
                 if (!it.isSuccessful) {
                     Quicktoast(requireActivity()).swarn("Registration failed.")
+                    authViewModel.setLoading()
                     return@addOnCompleteListener
                 }
 

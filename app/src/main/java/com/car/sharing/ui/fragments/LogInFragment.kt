@@ -5,11 +5,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.WindowManager
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.navigation.NavController
+import androidx.navigation.Navigation
 import com.car.sharing.R
 import com.car.sharing.databinding.FragmentLoginBinding
 import com.car.sharing.ui.activities.Home
@@ -21,6 +22,7 @@ import kotlinx.android.synthetic.main.fragment_login.*
 
 
 class LogInFragment : Fragment() {
+    private lateinit var navControler: NavController
     private lateinit var binder: FragmentLoginBinding
     private lateinit var authViewModel: AuthViewModel
     private lateinit var firebaseAuth: FirebaseAuth
@@ -46,8 +48,6 @@ class LogInFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
 
-        requireActivity().window
-            .setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE or WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
 
         binder = DataBindingUtil.inflate(inflater, R.layout.fragment_login, container, false)
 
@@ -56,6 +56,8 @@ class LogInFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        navControler = Navigation.findNavController(view)
 
         binder.emailField.requestFocus()
 
@@ -67,8 +69,11 @@ class LogInFragment : Fragment() {
         initObservers()
 
         binder.loginButton.setOnClickListener {
-
             logInWithEmail()
+        }
+
+        binder.forgotPass.setOnClickListener {
+            navControler.navigate(R.id.action_logInFragment_to_forgotPasswordFragment)
         }
 
     }
