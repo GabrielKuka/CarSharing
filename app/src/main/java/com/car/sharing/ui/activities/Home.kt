@@ -3,7 +3,11 @@ package com.car.sharing.ui.activities
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
 import com.car.sharing.R
+import com.car.sharing.ui.fragments.HomeFragment
+import com.car.sharing.ui.fragments.ProfileFragment
+import com.car.sharing.ui.fragments.SearchFragment
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.android.synthetic.main.home_activity.*
 
@@ -27,11 +31,37 @@ class Home : AppCompatActivity() {
 
         }
 
-        logout_button.setOnClickListener {
-            firebaseAuth.signOut()
-        }
-    }
+        bottom_nav.setOnNavigationItemSelectedListener {
 
+            var selectedFragment: Fragment? = null
+
+            when (it.itemId) {
+                R.id.home_button -> {
+                    selectedFragment = HomeFragment()
+                }
+
+                R.id.search_button -> {
+                    selectedFragment = SearchFragment()
+                }
+
+                R.id.profile_button -> {
+                    selectedFragment = ProfileFragment()
+                }
+
+            }
+
+            selectedFragment?.let { sF ->
+                switchFragment(sF)
+            }
+
+            true
+        }
+
+        if (savedInstanceState == null) {
+            switchFragment(HomeFragment())
+        }
+
+    }
 
     override fun onStart() {
         super.onStart()
@@ -41,5 +71,10 @@ class Home : AppCompatActivity() {
     override fun onStop() {
         super.onStop()
         firebaseAuth.removeAuthStateListener(authStateListener)
+    }
+
+    private fun switchFragment(destination: Fragment) {
+        supportFragmentManager.beginTransaction().replace(R.id.home_fragment_container, destination)
+            .commit()
     }
 }
