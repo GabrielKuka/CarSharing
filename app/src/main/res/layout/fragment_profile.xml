@@ -26,6 +26,7 @@
                 android:id="@+id/constraintLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:background="@color/colorPrimary"
                 android:elevation="15dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -121,7 +122,7 @@
                         android:layout_width="40dp"
                         android:layout_height="2dp"
                         android:layout_marginVertical="5dp"
-                        android:background="@color/green"
+                        android:background="@color/colorPrimary"
                         android:backgroundTint="@color/flat_green_2" />
 
                     <com.google.android.material.textview.MaterialTextView
@@ -161,7 +162,7 @@
                         android:layout_width="40dp"
                         android:layout_height="2dp"
                         android:layout_marginVertical="5dp"
-                        android:background="@color/green"
+                        android:background="@color/colorPrimary"
                         android:backgroundTint="@color/flat_green_2" />
 
                     <com.google.android.material.textview.MaterialTextView

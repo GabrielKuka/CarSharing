@@ -7,14 +7,6 @@
     tools:context=".ui.activities.Home">
 
 
-    <!--    <Button-->
-    <!--        android:id="@+id/logout_button"-->
-    <!--        android:layout_width="wrap_content"-->
-    <!--        android:layout_height="wrap_content"-->
-    <!--        android:layout_marginTop="30dp"-->
-    <!--        android:text="@string/sign_out"-->
-    <!--        />-->
-
     <FrameLayout
         android:id="@+id/home_fragment_container"
         android:layout_width="match_parent"

@@ -51,6 +51,7 @@ class ChooseAuth : Fragment() {
 
     }
 
+
     override fun onStart() {
         super.onStart()
 

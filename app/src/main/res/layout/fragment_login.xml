@@ -52,12 +52,12 @@
                 android:layout_marginTop="32dp"
                 android:text="@string/LogInText"
                 android:textSize="25sp"
-                app:layout_constraintEnd_toEndOf="@+id/email_field_layout"
-                app:layout_constraintStart_toStartOf="@+id/email_field_layout"
+                app:layout_constraintEnd_toEndOf="@+id/email_field"
+                app:layout_constraintStart_toStartOf="@+id/email_field"
                 app:layout_constraintTop_toBottomOf="@+id/textView2" />
 
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/email_field_layout"
+                android:id="@+id/email_field"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -71,7 +71,6 @@
                 app:layout_constraintTop_toBottomOf="@+id/materialTextView">
 
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/email_field"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="textEmailAddress"
@@ -79,19 +78,19 @@
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/pass_field_layout"
+                android:id="@+id/pass_field"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:hint="@string/password"
                 android:visibility="@{isLoading ? View.GONE : View.VISIBLE}"
-                app:layout_constraintEnd_toEndOf="@+id/email_field_layout"
-                app:layout_constraintStart_toStartOf="@+id/email_field_layout"
-                app:layout_constraintTop_toBottomOf="@+id/email_field_layout">
+                app:layout_constraintEnd_toEndOf="@+id/email_field"
+                app:layout_constraintStart_toStartOf="@+id/email_field"
+                app:layout_constraintTop_toBottomOf="@+id/email_field">
 
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/pass_field"
+
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="textPassword"
@@ -105,9 +104,9 @@
                 android:layout_marginTop="32dp"
                 android:text="@string/login"
                 android:visibility="@{isLoading ? View.GONE : View.VISIBLE}"
-                app:layout_constraintEnd_toEndOf="@+id/pass_field_layout"
-                app:layout_constraintStart_toStartOf="@+id/pass_field_layout"
-                app:layout_constraintTop_toBottomOf="@+id/pass_field_layout" />
+                app:layout_constraintEnd_toEndOf="@+id/pass_field"
+                app:layout_constraintStart_toStartOf="@+id/pass_field"
+                app:layout_constraintTop_toBottomOf="@+id/pass_field" />
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/forgotPass"
@@ -116,9 +115,10 @@
                 android:layout_marginTop="32dp"
                 android:layout_marginBottom="254dp"
                 android:text="@string/forgot_pass_text"
+                android:visibility="@{isLoading ? View.GONE : View.VISIBLE}"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="@+id/pass_field_layout"
-                app:layout_constraintStart_toStartOf="@+id/pass_field_layout"
+                app:layout_constraintEnd_toEndOf="@+id/pass_field"
+                app:layout_constraintStart_toStartOf="@+id/pass_field"
                 app:layout_constraintTop_toBottomOf="@+id/login_button" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -18,7 +18,6 @@ import com.car.sharing.ui.dialogs.TextDialog
 import com.car.sharing.viewmodels.AuthViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.meet.quicktoast.Quicktoast
-import kotlinx.android.synthetic.main.fragment_login.*
 
 
 class LogInFragment : Fragment() {
@@ -62,7 +61,7 @@ class LogInFragment : Fragment() {
         binder.emailField.requestFocus()
 
         if (email.isNotEmpty()) {
-            binder.emailField.setText(email)
+            binder.emailField.editText?.setText(email)
             binder.passField.requestFocus()
         }
 
@@ -85,8 +84,8 @@ class LogInFragment : Fragment() {
     }
 
     private fun logInWithEmail() {
-        val emailField = email_field.text.toString().trim()
-        val passField = pass_field.text.toString().trim()
+        val emailField = binder.emailField.editText?.text.toString().trim()
+        val passField = binder.passField.editText?.text.toString().trim()
 
         if (authViewModel.areFieldsEmpty(arrayOf(emailField, passField))) {
             Quicktoast(requireActivity()).swarn("There are empty fields.")

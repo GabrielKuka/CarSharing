@@ -24,4 +24,11 @@
     <string name="profile">Profile</string>
 
     <string name="def">Default Default</string>
+    <string name="use_vehicle_text">Use a vehicle</string>
+    <string name="provide_vehicle_text">Provide a vehicle</string>
+    <string name="car_name">Name of the car</string>
+    <string name="car_description">Describe your car</string>
+    <string name="price_per_day">Price per Day</string>
+    <string name="done">Done</string>
+    <string name="reservation_date">Enter reservation date</string>
 </resources>

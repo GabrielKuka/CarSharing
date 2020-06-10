@@ -17,7 +17,6 @@ import com.car.sharing.ui.dialogs.TextDialog
 import com.car.sharing.viewmodels.AuthViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.meet.quicktoast.Quicktoast
-import kotlinx.android.synthetic.main.fragment_register.*
 
 class RegisterFragment : Fragment() {
     private lateinit var binder: FragmentRegisterBinding
@@ -76,8 +75,8 @@ class RegisterFragment : Fragment() {
     }
 
     private fun registerAccount() {
-        val emailField = email_field.text.toString().trim()
-        val passField = pass_field.text.toString().trim()
+        val emailField = binder.emailField.editText?.text.toString().trim()
+        val passField = binder.passField.editText?.text.toString().trim()
 
         if (authViewModel.areFieldsEmpty(arrayOf(emailField, passField))) {
             Quicktoast(requireActivity()).swarn("There are empty fields.")

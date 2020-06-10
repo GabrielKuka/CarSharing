@@ -55,7 +55,7 @@ class ForgotPasswordFragment : Fragment() {
         initObservers()
 
         binder.sendEmail.setOnClickListener {
-            val emailValue = binder.emailField.text.toString().trim()
+            val emailValue = binder.emailField.editText?.text.toString().trim()
 
             if (authViewModel.areFieldsEmpty(arrayOf(emailValue))) {
                 Quicktoast(requireActivity()).swarn("There are empty fields!")
