@@ -11,11 +11,11 @@ import androidx.lifecycle.ViewModelProviders
 import com.car.sharing.R
 import com.car.sharing.databinding.FragmentAddEditPostBinding
 import com.car.sharing.models.Post
+import com.car.sharing.utils.IAddEdit
 import com.car.sharing.viewmodels.HomeViewModel
 import com.meet.quicktoast.Quicktoast
-import java.util.*
 
-class AddEditPost : Fragment() {
+class AddEditPost : Fragment(), IAddEdit {
 
     private lateinit var binder: FragmentAddEditPostBinding
     private lateinit var homeViewModel: HomeViewModel
@@ -60,8 +60,8 @@ class AddEditPost : Fragment() {
     }
 
     private fun addPost(carName: String, carDescription: String, price: Double) {
-        homeViewModel.setLoading()
-        val id = UUID.randomUUID().toString()
+
+        val id = homeViewModel.getPostRef().push().key!!
 
         // Add the post
         val post = Post(
@@ -71,17 +71,9 @@ class AddEditPost : Fragment() {
             homeViewModel.getUser()?.email!!
         )
 
+        val pair = Pair(id, post)
 
-        homeViewModel.getPostRef().child(id).setValue(post).addOnCompleteListener {
-            if (!it.isSuccessful) {
-                Quicktoast(requireActivity()).swarn("Failed to add the post")
-            } else {
-                Quicktoast(requireActivity()).linfo("Post added")
-                requireActivity().supportFragmentManager.popBackStack()
-            }
-
-            homeViewModel.setLoading()
-        }
+        homeViewModel.addPost(pair, this)
     }
 
     override fun onCreateView(
@@ -93,6 +85,17 @@ class AddEditPost : Fragment() {
             DataBindingUtil.inflate(inflater, R.layout.fragment_add_edit_post, container, false)
 
         return binder.root
+    }
+
+    override fun onSuccess(msg: String) {
+        homeViewModel.setLoading()
+        Quicktoast(requireActivity()).linfo(msg)
+        requireActivity().supportFragmentManager.popBackStack()
+    }
+
+    override fun onError(msg: String) {
+        homeViewModel.setLoading()
+        Quicktoast(requireActivity()).swarn(msg)
     }
 
 

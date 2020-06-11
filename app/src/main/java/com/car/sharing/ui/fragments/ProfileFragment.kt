@@ -6,14 +6,15 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProviders
 import com.car.sharing.R
 import com.car.sharing.databinding.FragmentProfileBinding
-import com.google.firebase.auth.FirebaseAuth
+import com.car.sharing.viewmodels.HomeViewModel
 import com.meet.quicktoast.Quicktoast
 
 class ProfileFragment : Fragment() {
 
-    private lateinit var firebaseAuth: FirebaseAuth
+    private lateinit var homeViewModel: HomeViewModel
     private lateinit var binder: FragmentProfileBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -22,16 +23,19 @@ class ProfileFragment : Fragment() {
 
         }
 
-        firebaseAuth = FirebaseAuth.getInstance()
+        homeViewModel = requireActivity().run {
+            ViewModelProviders.of(this).get(HomeViewModel::class.java)
+        }
+
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binder.user = firebaseAuth.currentUser
+        binder.user = homeViewModel.getUser()
 
         binder.signOutButton.setOnClickListener {
-            firebaseAuth.signOut()
+            homeViewModel.signOut()
         }
 
         binder.settingsButton.setOnClickListener {

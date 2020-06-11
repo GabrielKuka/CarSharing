@@ -14,14 +14,13 @@ import androidx.navigation.Navigation
 import com.car.sharing.R
 import com.car.sharing.databinding.FragmentRegisterBinding
 import com.car.sharing.ui.dialogs.TextDialog
+import com.car.sharing.utils.IRegister
 import com.car.sharing.viewmodels.AuthViewModel
-import com.google.firebase.auth.FirebaseAuth
 import com.meet.quicktoast.Quicktoast
 
-class RegisterFragment : Fragment() {
+class RegisterFragment : Fragment(), IRegister {
     private lateinit var binder: FragmentRegisterBinding
     private lateinit var authViewModel: AuthViewModel
-    private lateinit var firebaseAuth: FirebaseAuth
     private lateinit var navController: NavController
 
 
@@ -34,8 +33,6 @@ class RegisterFragment : Fragment() {
         authViewModel = requireActivity().run {
             ViewModelProviders.of(this).get(AuthViewModel::class.java)
         }
-
-        firebaseAuth = FirebaseAuth.getInstance()
 
     }
 
@@ -82,37 +79,27 @@ class RegisterFragment : Fragment() {
             Quicktoast(requireActivity()).swarn("There are empty fields.")
             return
         }
-        authViewModel.setLoading()
-        firebaseAuth.createUserWithEmailAndPassword(emailField, passField)
-            .addOnCanceledListener {
-                Quicktoast(requireActivity()).swarn("Registration Canceled.")
-            }.addOnCompleteListener {
-                if (!it.isSuccessful) {
-                    Quicktoast(requireActivity()).swarn("Registration failed.")
-                    authViewModel.setLoading()
-                    return@addOnCompleteListener
-                }
 
-                val user = firebaseAuth.currentUser
-                user?.sendEmailVerification()?.addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        showTextDialog("An email has been sent to the address provided. Check that email to verify your account")
-
-                        val bundle = bundleOf("email" to emailField)
-                        navController.navigate(R.id.action_register_to_logInFragment, bundle)
-
-                    } else {
-                        Quicktoast(requireActivity()).swarn("Failed to send email.")
-                    }
-
-                }
-                authViewModel.setLoading()
-            }
-
+        val keys = Pair(emailField, passField)
+        authViewModel.register(keys, this)
     }
 
     private fun showTextDialog(msg: String) {
         TextDialog(msg).show(requireActivity().supportFragmentManager, "")
+    }
+
+    override fun onErrorRegister(msg: String) {
+        authViewModel.setLoading()
+        showTextDialog(msg)
+    }
+
+    override fun onRegisterSuccess() {
+        authViewModel.setLoading()
+        val emailField = binder.emailField.editText?.text.toString().trim()
+
+        showTextDialog("An email has been sent to the address provided. Check that email to verify your account")
+        val bundle = bundleOf("email" to emailField)
+        navController.navigate(R.id.action_register_to_logInFragment, bundle)
     }
 
 }

@@ -12,11 +12,12 @@ import androidx.lifecycle.ViewModelProviders
 import com.car.sharing.R
 import com.car.sharing.databinding.FragmentForgotPasswordBinding
 import com.car.sharing.ui.dialogs.TextDialog
+import com.car.sharing.utils.IAccountRecover
 import com.car.sharing.viewmodels.AuthViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.meet.quicktoast.Quicktoast
 
-class ForgotPasswordFragment : Fragment() {
+class ForgotPasswordFragment : Fragment(), IAccountRecover {
 
     private lateinit var firebaseAuth: FirebaseAuth
     private lateinit var binder: FragmentForgotPasswordBinding
@@ -62,7 +63,7 @@ class ForgotPasswordFragment : Fragment() {
                 return@setOnClickListener
             }
 
-            sendEmail(emailValue)
+            authViewModel.recoverAccount(emailValue, this)
         }
     }
 
@@ -72,20 +73,19 @@ class ForgotPasswordFragment : Fragment() {
         })
     }
 
-    private fun sendEmail(email: String) {
-        authViewModel.setLoading()
-        firebaseAuth.sendPasswordResetEmail(email).addOnCompleteListener {
-            if (it.isSuccessful) {
-                showTextDialog("An email has been sent to your address. Check it out.")
-            } else {
-                showTextDialog(it.exception?.message!!)
-            }
-            authViewModel.setLoading()
-        }
-    }
 
     private fun showTextDialog(msg: String) {
         TextDialog(msg).show(requireActivity().supportFragmentManager, "")
+    }
+
+    override fun onEmailSent() {
+        authViewModel.setLoading()
+        showTextDialog("An email has been sent to your address. Check it out.")
+    }
+
+    override fun onRecoverError(msg: String) {
+        authViewModel.setLoading()
+        showTextDialog(msg)
     }
 
 }
