@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
 import com.car.sharing.R
 import com.car.sharing.databinding.FragmentProfileBinding
+import com.car.sharing.ui.dialogs.BasicDialog
 import com.car.sharing.viewmodels.HomeViewModel
 import com.meet.quicktoast.Quicktoast
 
@@ -35,7 +36,9 @@ class ProfileFragment : Fragment() {
         binder.user = homeViewModel.getUser()
 
         binder.signOutButton.setOnClickListener {
-            homeViewModel.signOut()
+            BasicDialog("Are you sure you want to sign out?") {
+                homeViewModel.signOut()
+            }.show(requireActivity().supportFragmentManager, "")
         }
 
         binder.settingsButton.setOnClickListener {

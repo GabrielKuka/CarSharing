@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout>
+
+    <data>
+
+        <import type="com.car.sharing.utils.Helper" />
+
+        <variable
+            name="interaction"
+            type="com.car.sharing.ui.adapters.CarPhotosAdapter.CarPhotoInteraction" />
+
+        <variable
+            name="carPhoto"
+            type="com.car.sharing.models.CarPhoto" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="7dp">
+
+        <ImageButton
+            android:id="@+id/remove_photo_button"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_margin="10dp"
+            android:background="?android:attr/selectableItemBackground"
+            android:clickable="true"
+            android:elevation="4dp"
+            android:focusable="true"
+            android:onClick="@{() -> interaction.removePhoto(carPhoto)}"
+            android:src="@android:drawable/ic_delete"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/car_image"
+            android:layout_width="160dp"
+            android:layout_height="160dp"
+            android:onClick="@{() -> interaction.onCarPhotoSelected(carPhoto)}"
+            app:imageResource="@{carPhoto.url}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_launcher_background" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

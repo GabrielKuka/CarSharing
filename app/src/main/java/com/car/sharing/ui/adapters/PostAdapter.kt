@@ -45,11 +45,11 @@ class PostAdapter(private val postInteraction: PostInteraction? = null) :
     val DIFF_CALLBACK = object : DiffUtil.ItemCallback<Post>() {
 
         override fun areItemsTheSame(oldItem: Post, newItem: Post): Boolean {
-            return oldItem.owner == newItem.owner
+            return oldItem.ownerEmail == newItem.ownerEmail
         }
 
         override fun areContentsTheSame(oldItem: Post, newItem: Post): Boolean {
-            return oldItem.equals(newItem)
+            return oldItem == newItem
         }
 
     }
@@ -60,7 +60,8 @@ class PostAdapter(private val postInteraction: PostInteraction? = null) :
     ) : RecyclerView.ViewHolder(binder.root)
 
     interface PostInteraction {
-        fun onPostSelected(position: Int, item: Post)
+        fun onPostSelected(post: Post)
     }
+
 }
 

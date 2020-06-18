@@ -1,12 +1,17 @@
 package com.car.sharing.models
 
+import android.os.Parcelable
 import com.google.firebase.database.IgnoreExtraProperties
+import kotlinx.android.parcel.Parcelize
 
 @IgnoreExtraProperties
+@Parcelize
 data class Post(
+    val postId: String = "",
     val carName: String? = "",
     val carDescription: String? = "",
     val price: Double? = 0.0,
-    val owner: String? = "",
+    val ownerName: String? = "",
+    val ownerEmail: String? = "",
     val isReserved: Boolean = false
-)
+) : Parcelable

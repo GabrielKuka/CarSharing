@@ -51,7 +51,7 @@ class RegisterFragment : Fragment(), IRegister {
 
         navController = Navigation.findNavController(view)
 
-        binder.emailField.requestFocus()
+        binder.fullNameField.requestFocus()
 
         initObservers()
 
@@ -74,14 +74,30 @@ class RegisterFragment : Fragment(), IRegister {
     private fun registerAccount() {
         val emailField = binder.emailField.editText?.text.toString().trim()
         val passField = binder.passField.editText?.text.toString().trim()
+        val confirmPasField = binder.confirmPassField.editText?.text.toString().trim()
+        val fullNameField = binder.fullNameField.editText?.text.toString().trim()
 
-        if (authViewModel.areFieldsEmpty(arrayOf(emailField, passField))) {
+        if (authViewModel.areFieldsEmpty(
+                arrayOf(
+                    emailField,
+                    passField,
+                    confirmPasField,
+                    fullNameField
+                )
+            )
+        ) {
             Quicktoast(requireActivity()).swarn("There are empty fields.")
             return
         }
 
+        if (passField != confirmPasField) {
+            Quicktoast(requireActivity()).swarn("Passwords must match")
+            binder.passField.requestFocus()
+            return
+        }
+
         val keys = Pair(emailField, passField)
-        authViewModel.register(keys, this)
+        authViewModel.register(fullNameField, keys, this)
     }
 
     private fun showTextDialog(msg: String) {

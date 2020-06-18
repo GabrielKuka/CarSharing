@@ -19,9 +19,9 @@ class AuthViewModel(private val authRepo: AuthRepo = AuthRepo()) : ViewModel() {
         authRepo.logInWithEmail(pair, authInteraction)
     }
 
-    fun register(pair: Pair<String, String>, iRegister: IRegister) {
+    fun register(fullName: String, pair: Pair<String, String>, iRegister: IRegister) {
         setLoading()
-        authRepo.register(pair, iRegister)
+        authRepo.register(fullName, pair, iRegister)
     }
 
     fun recoverAccount(email: String, iRecover: IAccountRecover){

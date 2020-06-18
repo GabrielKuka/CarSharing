@@ -16,6 +16,7 @@ import com.car.sharing.databinding.FragmentLoginBinding
 import com.car.sharing.ui.activities.Home
 import com.car.sharing.ui.dialogs.TextDialog
 import com.car.sharing.utils.AuthInteraction
+import com.car.sharing.utils.Helper.hideKeyboard
 import com.car.sharing.viewmodels.AuthViewModel
 import com.meet.quicktoast.Quicktoast
 
@@ -72,6 +73,7 @@ class LogInFragment : Fragment(), AuthInteraction {
         binder.forgotPass.setOnClickListener {
             navControler.navigate(R.id.action_logInFragment_to_forgotPasswordFragment)
         }
+
 
     }
 

@@ -1,5 +1,6 @@
 package com.car.sharing.utils
 
+import com.car.sharing.models.CarPhoto
 import com.car.sharing.models.Post
 
 interface AuthInteraction {
@@ -19,12 +20,21 @@ interface IAccountRecover {
 
 interface IFetch {
     fun onCanceled(msg: String)
-
     fun onSuccess(list: List<Post>)
 }
 
 interface IAddEdit {
     fun onSuccess(msg: String)
-
     fun onError(msg: String)
+    fun onPhotoUploadError(msg: String)
+}
+
+interface ISearch {
+    fun onSuccess(list: List<Post>)
+    fun onError(msg: String)
+}
+
+interface IPostPhotos {
+    fun onErrorRetrieve(msg: String)
+    fun onSuccessRetrieve(list: MutableList<CarPhoto>)
 }

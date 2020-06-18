@@ -4,9 +4,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.car.sharing.R
+import com.car.sharing.databinding.FragmentHomeBinding
 import com.car.sharing.models.Post
 import com.car.sharing.ui.adapters.PostAdapter
 import com.car.sharing.utils.IFetch
@@ -17,6 +20,7 @@ import kotlinx.android.synthetic.main.fragment_home.*
 class HomeFragment : Fragment(), PostAdapter.PostInteraction, IFetch {
 
     private lateinit var homeViewModel: HomeViewModel
+    private lateinit var binder: FragmentHomeBinding
     private lateinit var postAdapter: PostAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -35,10 +39,19 @@ class HomeFragment : Fragment(), PostAdapter.PostInteraction, IFetch {
         homeViewModel.fetchAllPosts(this)
     }
 
+    override fun onPause() {
+        super.onPause()
+        if (homeViewModel.isLoading().value!!) {
+            homeViewModel.setLoading()
+        }
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         initRecyclerView()
+
+        initObservers()
 
         provide_car_button.setOnClickListener {
             addFragmentOnTop(AddEditPost())
@@ -49,12 +62,20 @@ class HomeFragment : Fragment(), PostAdapter.PostInteraction, IFetch {
         }
     }
 
+    private fun initObservers() {
+        homeViewModel.isLoading().observe(viewLifecycleOwner, Observer {
+            binder.isLoading = it
+        })
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
 
-        return inflater.inflate(R.layout.fragment_home, container, false)
+        binder = DataBindingUtil.inflate(inflater, R.layout.fragment_home, container, false)
+
+        return binder.root
     }
 
     private fun initRecyclerView() {
@@ -72,16 +93,30 @@ class HomeFragment : Fragment(), PostAdapter.PostInteraction, IFetch {
             .add(R.id.home_fragment_container, fragment).addToBackStack(null).commit()
     }
 
-    override fun onPostSelected(position: Int, item: Post) {
-        Quicktoast(requireActivity()).sinfo("Selected")
+    override fun onPostSelected(post: Post) {
+        val bundle = Bundle()
+        bundle.putParcelable("post", post)
+
+        val postFragment = ViewPostFragment()
+        postFragment.arguments = bundle
+
+        requireActivity().supportFragmentManager
+            .beginTransaction()
+            .add(R.id.home_fragment_container, postFragment)
+            .addToBackStack("")
+            .commit()
+
     }
 
     override fun onCanceled(msg: String) {
+        homeViewModel.setLoading()
         Quicktoast(requireActivity()).swarn(msg)
     }
 
     override fun onSuccess(list: List<Post>) {
+        homeViewModel.setLoading()
         postAdapter.submitList(list)
     }
+
 
 }

@@ -31,4 +31,10 @@
     <string name="price_per_day">Price per Day</string>
     <string name="done">Done</string>
     <string name="reservation_date">Enter reservation date</string>
+    <string name="fullname">Full Name</string>
+    <string name="conf_pass">Confirm Password</string>
+
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="upload_img">Upload Images</string>
 </resources>

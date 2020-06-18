@@ -4,6 +4,7 @@ import com.car.sharing.utils.AuthInteraction
 import com.car.sharing.utils.IAccountRecover
 import com.car.sharing.utils.IRegister
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.UserProfileChangeRequest
 
 class AuthRepo {
     private val firebaseAuth = FirebaseAuth.getInstance()
@@ -24,7 +25,7 @@ class AuthRepo {
         }
     }
 
-    fun register(keys: Pair<String, String>, iRegister: IRegister){
+    fun register(fullName: String, keys: Pair<String, String>, iRegister: IRegister){
 
         firebaseAuth.createUserWithEmailAndPassword(keys.first, keys.second)
             .addOnCanceledListener {
@@ -39,6 +40,11 @@ class AuthRepo {
                 user?.sendEmailVerification()?.addOnCompleteListener { task ->
                     if (task.isSuccessful) {
                         iRegister.onRegisterSuccess()
+
+                        val profileUpdates = UserProfileChangeRequest.Builder()
+                            .setDisplayName(fullName).build()
+                        user.updateProfile(profileUpdates)
+
                     } else {
                         iRegister.onErrorRegister("Failed to send email.")
                     }
