@@ -2,6 +2,7 @@ package com.car.sharing.utils
 
 import com.car.sharing.models.CarPhoto
 import com.car.sharing.models.Post
+import com.car.sharing.models.Rating
 
 interface AuthInteraction {
     fun onErrorLogIn(msg: String)
@@ -37,4 +38,14 @@ interface ISearch {
 interface IPostPhotos {
     fun onErrorRetrieve(msg: String)
     fun onSuccessRetrieve(list: MutableList<CarPhoto>)
+}
+
+interface IRating {
+    fun onAddedRating(msg: String)
+    fun onErrorRating(msg: String)
+}
+
+interface IRatingsList {
+    fun onFetched(list: List<Rating>)
+    fun onErrorFetching(msg: String)
 }

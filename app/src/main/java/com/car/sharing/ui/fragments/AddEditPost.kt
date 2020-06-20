@@ -141,6 +141,8 @@ class AddEditPost : Fragment(), IAddEdit, CarPhotosAdapter.CarPhotoInteraction {
 
         val id = homeViewModel.getPostRef().push().key!!
 
+
+
         // Add the post
         val post = Post(
             id,
@@ -148,9 +150,9 @@ class AddEditPost : Fragment(), IAddEdit, CarPhotosAdapter.CarPhotoInteraction {
             carDescription,
             price,
             homeViewModel.getUser()?.displayName,
-            homeViewModel.getUser()?.email!!
+            homeViewModel.getUser()?.email!!,
+            photos[0].name
         )
-
 
 
         homeViewModel.addPost(post, photos, this)
@@ -168,7 +170,7 @@ class AddEditPost : Fragment(), IAddEdit, CarPhotosAdapter.CarPhotoInteraction {
     }
 
     override fun onSuccess(msg: String) {
-        homeViewModel.setLoading()
+       // homeViewModel.setLoading()
         Quicktoast(requireActivity()).linfo(msg)
         requireActivity().supportFragmentManager.popBackStack()
     }

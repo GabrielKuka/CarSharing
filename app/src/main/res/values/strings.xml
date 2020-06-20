@@ -28,6 +28,7 @@
     <string name="provide_vehicle_text">Provide a vehicle</string>
     <string name="car_name">Name of the car</string>
     <string name="car_description">Describe your car</string>
+    <string name="car_desc_title">Car Description</string>
     <string name="price_per_day">Price per Day</string>
     <string name="done">Done</string>
     <string name="reservation_date">Enter reservation date</string>
@@ -37,4 +38,8 @@
     <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="upload_img">Upload Images</string>
+    <string name="owner_info">Owner Information</string>
+    <string name="ratings">Ratings</string>
+    <string name="enter_review">Enter a review..</string>
+    <string name="see_all"><u>See All</u></string>
 </resources>

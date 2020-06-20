@@ -13,5 +13,6 @@ data class Post(
     val price: Double? = 0.0,
     val ownerName: String? = "",
     val ownerEmail: String? = "",
+    val mainPhoto: String? = "",
     val isReserved: Boolean = false
 ) : Parcelable

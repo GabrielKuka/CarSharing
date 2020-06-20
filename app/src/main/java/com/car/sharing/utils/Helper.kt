@@ -8,6 +8,11 @@ import androidx.databinding.BindingAdapter
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.car.sharing.R
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.ktx.getValue
 
 object Helper {
 
@@ -33,4 +38,32 @@ object Helper {
             .into(imageView)
     }
 
+    @JvmStatic
+    @BindingAdapter("mainPhoto")
+    fun setMainPhoto(imageView: ImageView, imageName: String) {
+        val photoUrl = FirebaseDatabase.getInstance().getReference("car_photos")
+            .child(imageName.substringBefore(".")).child("url")
+
+        val options = RequestOptions()
+            .placeholder(R.drawable.ic_launcher_background)
+            .error(R.drawable.ic_launcher_background)
+
+        photoUrl.addValueEventListener(object: ValueEventListener{
+            override fun onCancelled(p0: DatabaseError) {
+                // error
+            }
+
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if(snapshot.value != null){
+                    Glide.with(imageView.context)
+                        .setDefaultRequestOptions(options)
+                        .load(snapshot.value.toString())
+                        .into(imageView)
+                }
+            }
+        })
+
+
+
+    }
 }

@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.car.sharing.R
 import com.car.sharing.databinding.PostItemBinding
+import com.car.sharing.models.CarPhoto
 import com.car.sharing.models.Post
 
 class PostAdapter(private val postInteraction: PostInteraction? = null) :

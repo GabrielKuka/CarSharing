@@ -11,6 +11,7 @@ import androidx.lifecycle.ViewModelProviders
 import com.car.sharing.R
 import com.car.sharing.databinding.FragmentHomeBinding
 import com.car.sharing.models.Post
+import com.car.sharing.ui.adapters.PhotoViewPagerAdapter
 import com.car.sharing.ui.adapters.PostAdapter
 import com.car.sharing.utils.IFetch
 import com.car.sharing.viewmodels.HomeViewModel
@@ -22,6 +23,7 @@ class HomeFragment : Fragment(), PostAdapter.PostInteraction, IFetch {
     private lateinit var homeViewModel: HomeViewModel
     private lateinit var binder: FragmentHomeBinding
     private lateinit var postAdapter: PostAdapter
+    private lateinit var photosadapter: PhotoViewPagerAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,13 +55,15 @@ class HomeFragment : Fragment(), PostAdapter.PostInteraction, IFetch {
 
         initObservers()
 
-        provide_car_button.setOnClickListener {
+        binder.swipeLayout.setOnRefreshListener {
+            homeViewModel.fetchAllPosts(this)
+            binder.swipeLayout.isRefreshing = false
+        }
+
+        binder.provideCarButton.setOnClickListener {
             addFragmentOnTop(AddEditPost())
         }
 
-        use_car_button.setOnClickListener {
-            switchFragment(SearchFragment())
-        }
     }
 
     private fun initObservers() {
@@ -81,11 +85,6 @@ class HomeFragment : Fragment(), PostAdapter.PostInteraction, IFetch {
     private fun initRecyclerView() {
         postAdapter = PostAdapter(this)
         post_rv.adapter = postAdapter
-    }
-
-    private fun switchFragment(fragment: Fragment) {
-        requireActivity().supportFragmentManager.beginTransaction()
-            .replace(R.id.home_fragment_container, fragment).commit()
     }
 
     private fun addFragmentOnTop(fragment: Fragment) {

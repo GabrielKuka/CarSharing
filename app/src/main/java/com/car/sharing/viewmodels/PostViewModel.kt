@@ -1,17 +1,30 @@
 package com.car.sharing.viewmodels
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.car.sharing.models.Rating
 import com.car.sharing.repos.PostRepo
 import com.car.sharing.utils.IPostPhotos
-import com.google.firebase.database.FirebaseDatabase
+import com.car.sharing.utils.IRating
+import com.car.sharing.utils.IRatingsList
 
-class PostViewModel(private val postRepo: PostRepo = PostRepo()): ViewModel() {
-    private val dbRef = FirebaseDatabase.getInstance()
-    private val photosRef = dbRef.getReference("car_photos")
+class PostViewModel(private val postRepo: PostRepo = PostRepo()) : ViewModel() {
 
-    fun retrievePhotos(postId: String, iPostPhotos: IPostPhotos){
-        val query = photosRef.orderByChild("postId").equalTo(postId)
-        postRepo.retrievePhotos(query, iPostPhotos)
+
+    fun getCurrentUser() = postRepo.currentUser
+    fun getRatingsRef() = postRepo.ratingsRef
+
+    fun retrievePhotos(postId: String, iPostPhotos: IPostPhotos) {
+        postRepo.retrievePhotos(postId, iPostPhotos)
+    }
+
+    fun addRating(rating: Rating, iRating: IRating) {
+        postRepo.addRating(rating, iRating)
+    }
+
+    fun fetchRatings(postId: String, iRatingsList: IRatingsList){
+        postRepo.fetchRatings(postId, iRatingsList)
     }
 
 }

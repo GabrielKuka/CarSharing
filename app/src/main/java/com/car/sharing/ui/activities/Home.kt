@@ -12,12 +12,14 @@ import com.car.sharing.ui.fragments.SearchFragment
 import com.car.sharing.viewmodels.HomeViewModel
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.android.synthetic.main.home_activity.*
+import org.imaginativeworld.oopsnointernet.NoInternetDialog
 
 class Home : AppCompatActivity() {
 
-    private lateinit var homeViewModel: HomeViewModel
     private lateinit var firebaseAuth: FirebaseAuth
+    private lateinit var homeViewModel: HomeViewModel
     private lateinit var authStateListener: FirebaseAuth.AuthStateListener
+    private var noNetDialog: NoInternetDialog? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,9 +30,8 @@ class Home : AppCompatActivity() {
         homeViewModel = ViewModelProviders.of(this).get(HomeViewModel::class.java)
 
         authStateListener = FirebaseAuth.AuthStateListener {
-            val user = firebaseAuth.currentUser
 
-            if (user == null) {
+            if (firebaseAuth.currentUser == null) {
                 startActivity(Intent(this, Authentication::class.java))
             }
 
@@ -62,10 +63,25 @@ class Home : AppCompatActivity() {
             true
         }
 
+        // When activity open for the first time, launch home fragment
         if (savedInstanceState == null) {
             switchFragment(HomeFragment())
         }
 
+    }
+
+    override fun onResume() {
+        super.onResume()
+        noNetDialog = NoInternetDialog.Builder(this).apply {
+            cancelable = false
+            onAirplaneModeMessage = getString(R.string.airplane_mode)
+            noInternetConnectionMessage = getString(R.string.no_internet)
+        }.build()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        noNetDialog?.destroy()
     }
 
     override fun onStart() {

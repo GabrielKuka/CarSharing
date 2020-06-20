@@ -20,7 +20,7 @@ class HomeViewModel(private val homeRepo: HomeRepo = HomeRepo()) : ViewModel() {
             value = mutableListOf()
         }
 
-
+    fun getFirebaseAuth() = homeRepo.firebaseAuth
     fun getUser() = homeRepo.currentUser
     fun getPostRef() = homeRepo.postRef
 
@@ -28,7 +28,6 @@ class HomeViewModel(private val homeRepo: HomeRepo = HomeRepo()) : ViewModel() {
 
     fun addCarPhoto(carPhoto: CarPhoto) {
         _carPhotos.value?.add(carPhoto)
-
         _carPhotos.notifyObserver()
     }
 
@@ -58,11 +57,15 @@ class HomeViewModel(private val homeRepo: HomeRepo = HomeRepo()) : ViewModel() {
     }
 
     fun addPost(post: Post, photos: List<CarPhoto>, iAddEdit: IAddEdit) {
-        setLoading()
-        homeRepo.addPost(post, iAddEdit)
-        // For each photo, add the postId !!
-        photos.forEach { photo -> photo.postId = post.postId}
+
+        // 1. For each photo, add the postId !!
+        photos.forEach { photo -> photo.postId = post.postId }
+
+        // 2. Upload each photo
         photos.forEach { photo -> homeRepo.uploadPhoto(photo, iAddEdit) }
+
+        // 3. Add the post
+        homeRepo.addPost(post, iAddEdit)
 
     }
 

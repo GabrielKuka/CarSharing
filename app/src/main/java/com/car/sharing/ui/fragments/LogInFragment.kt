@@ -16,13 +16,12 @@ import com.car.sharing.databinding.FragmentLoginBinding
 import com.car.sharing.ui.activities.Home
 import com.car.sharing.ui.dialogs.TextDialog
 import com.car.sharing.utils.AuthInteraction
-import com.car.sharing.utils.Helper.hideKeyboard
 import com.car.sharing.viewmodels.AuthViewModel
 import com.meet.quicktoast.Quicktoast
 
 
 class LogInFragment : Fragment(), AuthInteraction {
-    private lateinit var navControler: NavController
+    private lateinit var navController: NavController
     private lateinit var binder: FragmentLoginBinding
     private lateinit var authViewModel: AuthViewModel
     private var email: String = ""
@@ -46,7 +45,6 @@ class LogInFragment : Fragment(), AuthInteraction {
         savedInstanceState: Bundle?
     ): View? {
 
-
         binder = DataBindingUtil.inflate(inflater, R.layout.fragment_login, container, false)
 
         return binder.root
@@ -55,14 +53,9 @@ class LogInFragment : Fragment(), AuthInteraction {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        navControler = Navigation.findNavController(view)
+        navController = Navigation.findNavController(view)
 
-        binder.emailField.requestFocus()
-
-        if (email.isNotEmpty()) {
-            binder.emailField.editText?.setText(email)
-            binder.passField.requestFocus()
-        }
+        initUI()
 
         initObservers()
 
@@ -71,10 +64,19 @@ class LogInFragment : Fragment(), AuthInteraction {
         }
 
         binder.forgotPass.setOnClickListener {
-            navControler.navigate(R.id.action_logInFragment_to_forgotPasswordFragment)
+            navController.navigate(R.id.action_logInFragment_to_forgotPasswordFragment)
         }
 
 
+    }
+
+    private fun initUI(){
+        binder.emailField.requestFocus()
+
+        if (email.isNotEmpty()) {
+            binder.emailField.editText?.setText(email)
+            binder.passField.requestFocus()
+        }
     }
 
     private fun initObservers() {
@@ -106,14 +108,13 @@ class LogInFragment : Fragment(), AuthInteraction {
         startActivity(intent)
     }
 
-    private fun showTextDialog(msg: String) {
-        TextDialog(msg).show(requireActivity().supportFragmentManager, "")
-    }
-
     override fun onErrorLogIn(msg: String) {
         authViewModel.setLoading()
         showTextDialog(msg)
     }
 
+    private fun showTextDialog(msg: String) {
+        TextDialog(msg).show(requireActivity().supportFragmentManager, "")
+    }
 
 }

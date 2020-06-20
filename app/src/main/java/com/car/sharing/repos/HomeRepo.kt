@@ -18,23 +18,24 @@ class HomeRepo {
 
     private val storageRef = FirebaseStorage.getInstance().getReference("car_photos")
 
-    private val firebaseAuth = FirebaseAuth.getInstance()
+    internal val firebaseAuth = FirebaseAuth.getInstance()
     internal val currentUser = firebaseAuth.currentUser
 
     private val rootNode = FirebaseDatabase.getInstance()
     internal val postRef = rootNode.getReference("posts")
     private val carPhotosRef = rootNode.getReference("car_photos")
 
+
     fun uploadPhoto(carPhoto: CarPhoto, iAddEdit: IAddEdit) {
         val fileReference = storageRef.child(carPhoto.name)
 
         fileReference.putFile(Uri.parse(carPhoto.url))
             .addOnSuccessListener {
-             //   val pair = Pair(it.uploadSessionUri.toString(), carPhoto.postId)
+                //   val pair = Pair(it.uploadSessionUri.toString(), carPhoto.postId)
 
                 val task: Task<Uri> = it.storage.downloadUrl
 
-                while(!task.isSuccessful);
+                while (!task.isSuccessful);
                 val downloadUrl: Uri? = task.result
 
                 carPhoto.url = downloadUrl.toString()
@@ -45,6 +46,8 @@ class HomeRepo {
             .addOnProgressListener { }
     }
 
+
+
     fun fetchAllPosts(iFetch: IFetch) {
         postRef.addValueEventListener(object : ValueEventListener {
             override fun onCancelled(p0: DatabaseError) {
@@ -54,7 +57,9 @@ class HomeRepo {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val postList = mutableListOf<Post>()
                 for (item in snapshot.children) {
-                    postList.add(item.getValue(Post::class.java)!!)
+                    val currentPost = item.getValue(Post::class.java)
+                    postList.add(currentPost!!)
+
                 }
 
                 iFetch.onSuccess(postList)

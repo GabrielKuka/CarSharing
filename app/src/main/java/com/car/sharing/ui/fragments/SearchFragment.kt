@@ -70,7 +70,17 @@ class SearchFragment : Fragment(), PostAdapter.PostInteraction, ISearch {
     }
 
     override fun onPostSelected(post: Post) {
-        Quicktoast(requireActivity()).swarn("Selected!")
+        val bundle = Bundle()
+        bundle.putParcelable("post", post)
+
+        val postFragment = ViewPostFragment()
+        postFragment.arguments = bundle
+
+        requireActivity().supportFragmentManager
+            .beginTransaction()
+            .add(R.id.home_fragment_container, postFragment)
+            .addToBackStack("")
+            .commit()
     }
 
     override fun onSuccess(list: List<Post>) {
