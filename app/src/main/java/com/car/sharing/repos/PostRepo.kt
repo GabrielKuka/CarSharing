@@ -2,43 +2,102 @@ package com.car.sharing.repos
 
 import com.car.sharing.models.CarPhoto
 import com.car.sharing.models.Rating
-import com.car.sharing.utils.Helper
-import com.car.sharing.utils.IPostPhotos
-import com.car.sharing.utils.IRating
-import com.car.sharing.utils.IRatingInteraction
+import com.car.sharing.utils.*
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import com.google.firebase.storage.FirebaseStorage
 
 class PostRepo {
 
+    private val storageRef = FirebaseStorage.getInstance()
     private val dbRef = FirebaseDatabase.getInstance()
     private val photosRef = dbRef.getReference("car_photos")
     internal val ratingsRef = dbRef.getReference("post_ratings")
     internal val currentUser = FirebaseAuth.getInstance().currentUser
 
+    fun deletePost(postId: String, iPost: IPost) {
+        dbRef.getReference("posts").child(postId).removeValue().addOnCompleteListener {
+            if (!it.isSuccessful) {
+                // failed to delete
+                iPost.onDeleteError("Failed to delete this post!")
+                return@addOnCompleteListener
+            }
+            deleteRatings(postId)
+            deletePhotos(postId)
+
+
+        }.addOnFailureListener {
+            iPost.onDeleteError(it.message.toString())
+        }
+    }
+
+    private fun deleteRatings(postId: String) {
+
+        ratingsRef.orderByChild("postId").equalTo(postId)
+            .addValueEventListener(object : ValueEventListener {
+                override fun onCancelled(p0: DatabaseError) {
+                    // error
+                }
+
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    snapshot.children.forEach { it ->
+                        ratingsRef.child(it.child("rateId").value.toString()).removeValue()
+                    }
+
+                }
+            })
+    }
+
+    private fun deletePhotos(postId: String) {
+        val photosNames = mutableListOf<String>()
+        photosRef.orderByChild("postId").equalTo(postId)
+            .addValueEventListener(object : ValueEventListener {
+                override fun onCancelled(p0: DatabaseError) {
+                    // error
+                }
+
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    for (item in snapshot.children) {
+                        val name = item.child("name").value.toString()
+                        photosNames.add(name)
+                    }
+                    snapshot.children.forEach { it ->
+                        photosRef.child(
+                            it.child("name").value.toString().substringBefore(".")
+                        ).removeValue()
+                    }
+
+                    for (photoName in photosNames) {
+                        storageRef.getReference("car_photos/$photoName").delete()
+                    }
+
+                }
+            })
+    }
+
     fun hasUserRated(postId: String, email: String, iRatingInteraction: IRatingInteraction) {
 
         val query = ratingsRef.orderByChild("reviewerEmail").equalTo(email)
 
-        query.addValueEventListener(object: ValueEventListener{
+        query.addValueEventListener(object : ValueEventListener {
             override fun onCancelled(p0: DatabaseError) {
                 iRatingInteraction.onErrorRating(p0.message)
             }
 
             override fun onDataChange(snapshot: DataSnapshot) {
 
-                    for(item in snapshot.children){
-                        val currentRatePostId = item.child("postId").value.toString()
-                        if(postId == currentRatePostId){
-                           // Success
-                            val currentRating = item.getValue(Rating::class.java)
-                            iRatingInteraction.onHasUserRated(currentRating!!)
-                            break
-                        }
+                for (item in snapshot.children) {
+                    val currentRatePostId = item.child("postId").value.toString()
+                    if (postId == currentRatePostId) {
+                        // Success
+                        val currentRating = item.getValue(Rating::class.java)
+                        iRatingInteraction.onHasUserRated(currentRating!!)
+                        break
                     }
+                }
             }
         })
 

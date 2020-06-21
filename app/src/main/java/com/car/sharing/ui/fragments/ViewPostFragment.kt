@@ -2,8 +2,10 @@ package com.car.sharing.ui.fragments
 
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.PopupMenu
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
@@ -13,13 +15,16 @@ import com.car.sharing.models.CarPhoto
 import com.car.sharing.models.Post
 import com.car.sharing.models.Rating
 import com.car.sharing.ui.adapters.PhotoViewPagerAdapter
+import com.car.sharing.ui.dialogs.BasicDialog
 import com.car.sharing.ui.dialogs.TextDialog
+import com.car.sharing.utils.IPost
 import com.car.sharing.utils.IPostPhotos
 import com.car.sharing.utils.IRatingInteraction
 import com.car.sharing.viewmodels.PostViewModel
 import com.meet.quicktoast.Quicktoast
 
-class ViewPostFragment : Fragment(), IPostPhotos, IRatingInteraction {
+class ViewPostFragment : Fragment(), IPostPhotos, IRatingInteraction,
+    PopupMenu.OnMenuItemClickListener, IPost {
 
     private lateinit var binder: FragmentViewPostBinding
     private lateinit var postViewModel: PostViewModel
@@ -63,6 +68,12 @@ class ViewPostFragment : Fragment(), IPostPhotos, IRatingInteraction {
             addFragmentOnTop(ratingsFragment)
         }
 
+        binder.postMenuButton.setOnClickListener {
+            val popup = PopupMenu(requireActivity(), it)
+            popup.setOnMenuItemClickListener(this)
+            popup.inflate(R.menu.view_post_menu)
+            popup.show()
+        }
 
     }
 
@@ -129,6 +140,31 @@ class ViewPostFragment : Fragment(), IPostPhotos, IRatingInteraction {
 
     private fun showTextDialog(msg: String) {
         TextDialog(msg).show(requireActivity().supportFragmentManager, "")
+    }
+
+    override fun onMenuItemClick(item: MenuItem?): Boolean {
+        return when (item?.itemId) {
+            R.id.delete_post_button -> {
+                BasicDialog("Are you sure you want to delete this post?"){
+                    requireActivity().supportFragmentManager.beginTransaction().detach(this).commit()
+                    postViewModel.deletePost(post.postId, this)
+                }.show(requireActivity().supportFragmentManager, "")
+                true
+            }
+
+            R.id.edit_post_button -> {
+                Quicktoast(requireActivity()).sinfo("Edit Post")
+                true
+            }
+            else -> {
+                false
+            }
+        }
+    }
+
+
+    override fun onDeleteError(msg: String) {
+        showTextDialog(msg)
     }
 
 }

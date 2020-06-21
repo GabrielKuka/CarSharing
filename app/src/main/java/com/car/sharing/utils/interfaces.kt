@@ -30,6 +30,11 @@ interface IAddEdit {
     fun onPhotoUploadError(msg: String)
 }
 
+interface IPost {
+
+    fun onDeleteError(msg: String)
+}
+
 interface ISearch {
     fun onSuccess(list: List<Post>)
     fun onError(msg: String)
@@ -51,3 +56,4 @@ interface IRating {
     fun onRatingsListFetched(list: List<Rating>)
     fun onErrorFetching(msg: String)
 }
+

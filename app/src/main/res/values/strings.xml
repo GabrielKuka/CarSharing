@@ -42,4 +42,6 @@
     <string name="ratings">Ratings</string>
     <string name="enter_review">Enter a review..</string>
     <string name="see_all"><u>See All</u></string>
+    <string name="delete_post">Delete Post</string>
+    <string name="edit_post">Edit Post</string>
 </resources>

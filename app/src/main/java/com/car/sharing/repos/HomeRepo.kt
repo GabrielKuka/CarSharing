@@ -31,7 +31,6 @@ class HomeRepo {
 
         fileReference.putFile(Uri.parse(carPhoto.url))
             .addOnSuccessListener {
-                //   val pair = Pair(it.uploadSessionUri.toString(), carPhoto.postId)
 
                 val task: Task<Uri> = it.storage.downloadUrl
 
