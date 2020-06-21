@@ -40,12 +40,14 @@ interface IPostPhotos {
     fun onSuccessRetrieve(list: MutableList<CarPhoto>)
 }
 
-interface IRating {
+interface IRatingInteraction {
     fun onAddedRating(msg: String)
     fun onErrorRating(msg: String)
+    fun onPostRatingFetched(avg: Double)
+    fun onHasUserRated(rating: Rating)
 }
 
-interface IRatingsList {
-    fun onFetched(list: List<Rating>)
+interface IRating {
+    fun onRatingsListFetched(list: List<Rating>)
     fun onErrorFetching(msg: String)
 }

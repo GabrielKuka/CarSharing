@@ -1,13 +1,11 @@
 package com.car.sharing.viewmodels
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.car.sharing.models.Rating
 import com.car.sharing.repos.PostRepo
 import com.car.sharing.utils.IPostPhotos
+import com.car.sharing.utils.IRatingInteraction
 import com.car.sharing.utils.IRating
-import com.car.sharing.utils.IRatingsList
 
 class PostViewModel(private val postRepo: PostRepo = PostRepo()) : ViewModel() {
 
@@ -19,12 +17,20 @@ class PostViewModel(private val postRepo: PostRepo = PostRepo()) : ViewModel() {
         postRepo.retrievePhotos(postId, iPostPhotos)
     }
 
-    fun addRating(rating: Rating, iRating: IRating) {
-        postRepo.addRating(rating, iRating)
+    fun addRating(rating: Rating, iRatingInteraction: IRatingInteraction) {
+        postRepo.addRating(rating, iRatingInteraction)
     }
 
-    fun fetchRatings(postId: String, iRatingsList: IRatingsList){
-        postRepo.fetchRatings(postId, iRatingsList)
+    fun fetchRatings(postId: String, iRating: IRating){
+        postRepo.fetchRatings(postId, iRating)
+    }
+
+    fun fetchPostRating(postId: String, iRatingInteraction: IRatingInteraction){
+        postRepo.fetchPostRating(postId, iRatingInteraction)
+    }
+
+    fun hasUserRated(postId: String, iRatingInteraction: IRatingInteraction){
+         postRepo.hasUserRated(postId, getCurrentUser()?.email.toString(), iRatingInteraction)
     }
 
 }

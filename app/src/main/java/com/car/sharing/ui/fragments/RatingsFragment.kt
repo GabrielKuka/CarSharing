@@ -9,13 +9,13 @@ import androidx.lifecycle.ViewModelProviders
 import com.car.sharing.R
 import com.car.sharing.models.Rating
 import com.car.sharing.ui.adapters.RatingAdapter
-import com.car.sharing.utils.IRatingsList
+import com.car.sharing.utils.IRating
 import com.car.sharing.viewmodels.PostViewModel
 import com.meet.quicktoast.Quicktoast
 import kotlinx.android.synthetic.main.fragment_ratings.*
 
 
-class RatingsFragment : Fragment(), IRatingsList {
+class RatingsFragment : Fragment(), IRating {
 
     private lateinit var postViewModel: PostViewModel
     private lateinit var ratingAdapter: RatingAdapter
@@ -59,7 +59,7 @@ class RatingsFragment : Fragment(), IRatingsList {
         return inflater.inflate(R.layout.fragment_ratings, container, false)
     }
 
-    override fun onFetched(list: List<Rating>) {
+    override fun onRatingsListFetched(list: List<Rating>) {
         ratingAdapter.submitList(list)
     }
 

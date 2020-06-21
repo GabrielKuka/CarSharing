@@ -15,11 +15,11 @@ import com.car.sharing.models.Rating
 import com.car.sharing.ui.adapters.PhotoViewPagerAdapter
 import com.car.sharing.ui.dialogs.TextDialog
 import com.car.sharing.utils.IPostPhotos
-import com.car.sharing.utils.IRating
+import com.car.sharing.utils.IRatingInteraction
 import com.car.sharing.viewmodels.PostViewModel
 import com.meet.quicktoast.Quicktoast
 
-class ViewPostFragment : Fragment(), IPostPhotos, IRating {
+class ViewPostFragment : Fragment(), IPostPhotos, IRatingInteraction {
 
     private lateinit var binder: FragmentViewPostBinding
     private lateinit var postViewModel: PostViewModel
@@ -45,6 +45,10 @@ class ViewPostFragment : Fragment(), IPostPhotos, IRating {
 
         postViewModel.retrievePhotos(post.postId, this)
 
+        postViewModel.fetchPostRating(post.postId, this)
+
+        postViewModel.hasUserRated(post.postId, this)
+
         binder.ratingButton.setOnClickListener {
             addRating()
         }
@@ -58,6 +62,15 @@ class ViewPostFragment : Fragment(), IPostPhotos, IRating {
 
             addFragmentOnTop(ratingsFragment)
         }
+
+
+    }
+
+    override fun onHasUserRated(rating: Rating) {
+        binder.userRating = rating
+    }
+
+    override fun onPostRatingFetched(avg: Double) {
 
     }
 

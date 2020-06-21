@@ -13,8 +13,16 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.getValue
+import java.math.RoundingMode
+import java.text.DecimalFormat
 
 object Helper {
+
+    fun roundOffDecimal(number: Double): Double? {
+        val df = DecimalFormat("#.#")
+        df.roundingMode = RoundingMode.HALF_EVEN
+        return df.format(number).toDouble()
+    }
 
     fun hideKeyboard(v: View) {
         val inputMethodManager =

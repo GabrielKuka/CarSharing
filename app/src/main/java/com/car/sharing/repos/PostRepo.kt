@@ -2,9 +2,10 @@ package com.car.sharing.repos
 
 import com.car.sharing.models.CarPhoto
 import com.car.sharing.models.Rating
+import com.car.sharing.utils.Helper
 import com.car.sharing.utils.IPostPhotos
 import com.car.sharing.utils.IRating
-import com.car.sharing.utils.IRatingsList
+import com.car.sharing.utils.IRatingInteraction
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -18,12 +19,72 @@ class PostRepo {
     internal val ratingsRef = dbRef.getReference("post_ratings")
     internal val currentUser = FirebaseAuth.getInstance().currentUser
 
-    fun fetchRatings(postId: String, iRatingsList: IRatingsList) {
+    fun hasUserRated(postId: String, email: String, iRatingInteraction: IRatingInteraction) {
+
+        val query = ratingsRef.orderByChild("reviewerEmail").equalTo(email)
+
+        query.addValueEventListener(object: ValueEventListener{
+            override fun onCancelled(p0: DatabaseError) {
+                iRatingInteraction.onErrorRating(p0.message)
+            }
+
+            override fun onDataChange(snapshot: DataSnapshot) {
+
+                    for(item in snapshot.children){
+                        val currentRatePostId = item.child("postId").value.toString()
+                        if(postId == currentRatePostId){
+                           // Success
+                            val currentRating = item.getValue(Rating::class.java)
+                            iRatingInteraction.onHasUserRated(currentRating!!)
+                            break
+                        }
+                    }
+            }
+        })
+
+    }
+
+    fun fetchPostRating(postId: String, iRatingInteraction: IRatingInteraction) {
         val query = ratingsRef.orderByChild("postId").equalTo(postId)
 
         query.addValueEventListener(object : ValueEventListener {
             override fun onCancelled(p0: DatabaseError) {
-                iRatingsList.onErrorFetching(p0.message)
+                iRatingInteraction.onErrorRating(p0.message)
+            }
+
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if (snapshot.children.count() == 0) {
+                    iRatingInteraction.onPostRatingFetched(0.0)
+                } else {
+                    var sum = 0.0
+                    for (item in snapshot.children) {
+                        val rating: Double = item.child("rateNumber").value.toString().toDouble()
+                        sum += rating
+                    }
+
+                    val avg = Helper.roundOffDecimal((sum / snapshot.children.count()))
+                    updatePostRating(postId, avg!!)
+                }
+            }
+        })
+    }
+
+    fun updatePostRating(postId: String, rateNumber: Double) {
+        val query = dbRef.getReference("posts").child(postId)
+
+        val map: MutableMap<String, Any> = mutableMapOf()
+        map["rateNumber"] = rateNumber
+
+        query.updateChildren(map)
+
+    }
+
+    fun fetchRatings(postId: String, iRating: IRating) {
+        val query = ratingsRef.orderByChild("postId").equalTo(postId)
+
+        query.addValueEventListener(object : ValueEventListener {
+            override fun onCancelled(p0: DatabaseError) {
+                iRating.onErrorFetching(p0.message)
             }
 
             override fun onDataChange(snapshot: DataSnapshot) {
@@ -34,23 +95,23 @@ class PostRepo {
                     ratingsList.add(rating!!)
                 }
 
-                iRatingsList.onFetched(ratingsList)
+                iRating.onRatingsListFetched(ratingsList)
             }
         })
     }
 
-    fun addRating(rating: Rating, iRating: IRating) {
+    fun addRating(rating: Rating, iRatingInteraction: IRatingInteraction) {
         ratingsRef.child(rating.rateId).setValue(rating)
             .addOnCompleteListener {
                 if (!it.isSuccessful) {
-                    iRating.onErrorRating("Failed to add a rating")
+                    iRatingInteraction.onErrorRating("Failed to add a rating")
                     return@addOnCompleteListener
                 }
 
-                iRating.onAddedRating("Added Successfully")
+                iRatingInteraction.onAddedRating("Added Successfully")
             }
             .addOnFailureListener {
-                iRating.onErrorRating("Error adding a rating")
+                iRatingInteraction.onErrorRating("Error adding a rating")
             }
     }
 
