@@ -18,7 +18,7 @@ class HomeRepo {
 
     private val storageRef = FirebaseStorage.getInstance().getReference("car_photos")
 
-    internal val firebaseAuth = FirebaseAuth.getInstance()
+    private val firebaseAuth = FirebaseAuth.getInstance()
     internal val currentUser = firebaseAuth.currentUser
 
     private val rootNode = FirebaseDatabase.getInstance()

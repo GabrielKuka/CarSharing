@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import com.car.sharing.models.CarPhoto
 import com.car.sharing.models.Post
 import com.car.sharing.repos.HomeRepo
+import com.car.sharing.repos.PostRepo
 import com.car.sharing.utils.IAddEdit
 import com.car.sharing.utils.IFetch
 import com.car.sharing.utils.ISearch
@@ -20,7 +21,6 @@ class HomeViewModel(private val homeRepo: HomeRepo = HomeRepo()) : ViewModel() {
             value = mutableListOf()
         }
 
-    fun getFirebaseAuth() = homeRepo.firebaseAuth
     fun getUser() = homeRepo.currentUser
     fun getPostRef() = homeRepo.postRef
 
@@ -66,6 +66,17 @@ class HomeViewModel(private val homeRepo: HomeRepo = HomeRepo()) : ViewModel() {
 
         // 3. Add the post
         homeRepo.addPost(post, iAddEdit)
+
+    }
+
+    fun editPost(post: Post, photos: List<CarPhoto>, iAddEdit: IAddEdit){
+        val postRepo = PostRepo()
+
+        // 1. For each photo, add the postId !!
+        photos.forEach { photo -> photo.postId = post.postId }
+
+        // 2. Update Post
+        postRepo.updatePost(post, photos, iAddEdit)
 
     }
 

@@ -29,10 +29,14 @@ class AddEditPost : Fragment(), IAddEdit, CarPhotosAdapter.CarPhotoInteraction {
     private lateinit var homeViewModel: HomeViewModel
     private lateinit var carPhotosAdapter: CarPhotosAdapter
 
+    private var editPost: Post? = null
+    private var carPhotos: List<CarPhoto>? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
-
+            editPost = it.getParcelable("post")
+            carPhotos = it.getParcelableArrayList("carPhotos")
         }
         homeViewModel = requireActivity().run {
             ViewModelProviders.of(this).get(HomeViewModel::class.java)
@@ -42,6 +46,12 @@ class AddEditPost : Fragment(), IAddEdit, CarPhotosAdapter.CarPhotoInteraction {
     @SuppressLint("SetTextI18n")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        if (!carPhotos.isNullOrEmpty()) {
+            carPhotos!!.forEach { homeViewModel.addCarPhoto(it) }
+        }
+
+        binder.post = editPost
 
         initRecyclerView()
 
@@ -64,18 +74,63 @@ class AddEditPost : Fragment(), IAddEdit, CarPhotosAdapter.CarPhotoInteraction {
                 return@setOnClickListener
             }
 
-            addPost(
-                carName!!,
-                carDescription!!,
-                price!!.toDouble(),
-                homeViewModel.getCarPhotos().value!!
-            )
+            if (editPost == null) {
+                addPost(
+                    carName!!,
+                    carDescription!!,
+                    price!!.toDouble(),
+                    homeViewModel.getCarPhotos().value!!
+                )
+            }else {
+                editPost(carName!!, carDescription!!, price!!.toDouble(), homeViewModel.getCarPhotos().value!!)
+            }
+
 
         }
 
         binder.uploadImageButton.setOnClickListener {
             openFileChooser()
         }
+    }
+
+    private fun editPost(carName: String, carDescription: String, price: Double, photos: List<CarPhoto>){
+
+        val post = Post(
+            editPost!!.postId,
+            carName,
+            carDescription,
+            price,
+            homeViewModel.getUser()?.displayName,
+            homeViewModel.getUser()?.email!!,
+            photos[0].name
+        )
+
+        homeViewModel.editPost(post, photos, this)
+    }
+
+    private fun addPost(
+        carName: String,
+        carDescription: String,
+        price: Double,
+        photos: List<CarPhoto>
+    ) {
+
+        val id = homeViewModel.getPostRef().push().key!!
+
+
+        // Add the post
+        val post = Post(
+            id,
+            carName,
+            carDescription,
+            price,
+            homeViewModel.getUser()?.displayName,
+            homeViewModel.getUser()?.email!!,
+            photos[0].name
+        )
+
+
+        homeViewModel.addPost(post, photos, this)
     }
 
     private fun openFileChooser() {
@@ -105,6 +160,13 @@ class AddEditPost : Fragment(), IAddEdit, CarPhotosAdapter.CarPhotoInteraction {
 
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        if (!homeViewModel.getCarPhotos().value.isNullOrEmpty()) {
+            homeViewModel.getCarPhotos().value!!.clear()
+        }
+    }
+
     override fun onPhotoUploadError(msg: String) {
         Quicktoast(requireActivity()).swarn(msg)
     }
@@ -132,31 +194,7 @@ class AddEditPost : Fragment(), IAddEdit, CarPhotosAdapter.CarPhotoInteraction {
         carPhotosAdapter.notifyDataSetChanged()
     }
 
-    private fun addPost(
-        carName: String,
-        carDescription: String,
-        price: Double,
-        photos: List<CarPhoto>
-    ) {
 
-        val id = homeViewModel.getPostRef().push().key!!
-
-
-
-        // Add the post
-        val post = Post(
-            id,
-            carName,
-            carDescription,
-            price,
-            homeViewModel.getUser()?.displayName,
-            homeViewModel.getUser()?.email!!,
-            photos[0].name
-        )
-
-
-        homeViewModel.addPost(post, photos, this)
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -170,8 +208,7 @@ class AddEditPost : Fragment(), IAddEdit, CarPhotosAdapter.CarPhotoInteraction {
     }
 
     override fun onSuccess(msg: String) {
-       // homeViewModel.setLoading()
-        Quicktoast(requireActivity()).linfo(msg)
+        Quicktoast(requireContext()).linfo(msg)
         requireActivity().supportFragmentManager.popBackStack()
     }
 

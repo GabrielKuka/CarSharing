@@ -29,7 +29,9 @@ class ViewPostFragment : Fragment(), IPostPhotos, IRatingInteraction,
     private lateinit var binder: FragmentViewPostBinding
     private lateinit var postViewModel: PostViewModel
     private lateinit var photoAdapter: PhotoViewPagerAdapter
+
     private lateinit var post: Post
+    private lateinit var carPhotos: List<CarPhoto>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -118,6 +120,7 @@ class ViewPostFragment : Fragment(), IPostPhotos, IRatingInteraction,
     }
 
     override fun onSuccessRetrieve(list: MutableList<CarPhoto>) {
+        carPhotos = list
         photoAdapter = PhotoViewPagerAdapter(requireContext(), list)
         binder.photoViewPager.adapter = photoAdapter
     }
@@ -145,15 +148,23 @@ class ViewPostFragment : Fragment(), IPostPhotos, IRatingInteraction,
     override fun onMenuItemClick(item: MenuItem?): Boolean {
         return when (item?.itemId) {
             R.id.delete_post_button -> {
-                BasicDialog("Are you sure you want to delete this post?"){
-                    requireActivity().supportFragmentManager.beginTransaction().detach(this).commit()
+                BasicDialog("Are you sure you want to delete this post?") {
+                    requireActivity().supportFragmentManager.beginTransaction().detach(this)
+                        .commit()
                     postViewModel.deletePost(post.postId, this)
                 }.show(requireActivity().supportFragmentManager, "")
                 true
             }
 
             R.id.edit_post_button -> {
-                Quicktoast(requireActivity()).sinfo("Edit Post")
+                val bundle = Bundle()
+                bundle.putParcelable("post", post)
+                bundle.putParcelableArrayList("carPhotos", ArrayList<CarPhoto>(carPhotos))
+
+                val fragment = AddEditPost()
+                fragment.arguments = bundle
+
+                addFragmentOnTop(fragment)
                 true
             }
             else -> {

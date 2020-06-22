@@ -1,8 +1,11 @@
 package com.car.sharing.repos
 
+import android.net.Uri
 import com.car.sharing.models.CarPhoto
+import com.car.sharing.models.Post
 import com.car.sharing.models.Rating
 import com.car.sharing.utils.*
+import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -26,7 +29,7 @@ class PostRepo {
                 return@addOnCompleteListener
             }
             deleteRatings(postId)
-            deletePhotos(postId)
+            deletePostPhotos(postId)
 
 
         }.addOnFailureListener {
@@ -34,24 +37,8 @@ class PostRepo {
         }
     }
 
-    private fun deleteRatings(postId: String) {
 
-        ratingsRef.orderByChild("postId").equalTo(postId)
-            .addValueEventListener(object : ValueEventListener {
-                override fun onCancelled(p0: DatabaseError) {
-                    // error
-                }
-
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    snapshot.children.forEach { it ->
-                        ratingsRef.child(it.child("rateId").value.toString()).removeValue()
-                    }
-
-                }
-            })
-    }
-
-    private fun deletePhotos(postId: String) {
+    private fun deletePostPhotos(postId: String) {
         val photosNames = mutableListOf<String>()
         photosRef.orderByChild("postId").equalTo(postId)
             .addValueEventListener(object : ValueEventListener {
@@ -78,29 +65,104 @@ class PostRepo {
             })
     }
 
-    fun hasUserRated(postId: String, email: String, iRatingInteraction: IRatingInteraction) {
 
-        val query = ratingsRef.orderByChild("reviewerEmail").equalTo(email)
+    fun updatePost(post: Post, carPhotos: List<CarPhoto>, iAddEdit: IAddEdit) {
+        val query = dbRef.getReference("posts").child(post.postId)
+        query.setValue(post).addOnFailureListener { iAddEdit.onError(it.message.toString()) }
+        processPhotos(post.postId, carPhotos, iAddEdit)
+    }
 
-        query.addValueEventListener(object : ValueEventListener {
+    private fun processPhotos(postId: String, carPhotos: List<CarPhoto>, iAddEdit: IAddEdit) {
+        val toBeUploaded = mutableListOf<CarPhoto>()
+        val uploadedPhotos = mutableListOf<CarPhoto>()
+        val excludedPhotos = mutableListOf<CarPhoto>()
+        val toBeDeletedPhotos = mutableListOf<CarPhoto>()
+
+        val query = photosRef.orderByChild("postId").equalTo(postId)
+
+
+        query.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onCancelled(p0: DatabaseError) {
-                iRatingInteraction.onErrorRating(p0.message)
+                iAddEdit.onError(p0.message)
             }
 
             override fun onDataChange(snapshot: DataSnapshot) {
-
                 for (item in snapshot.children) {
-                    val currentRatePostId = item.child("postId").value.toString()
-                    if (postId == currentRatePostId) {
-                        // Success
-                        val currentRating = item.getValue(Rating::class.java)
-                        iRatingInteraction.onHasUserRated(currentRating!!)
-                        break
+                    val currentPhoto = item.getValue(CarPhoto::class.java)
+                    uploadedPhotos.add(currentPhoto!!)
+
+                    carPhotos.forEach loop@{ it ->
+                        if (it.url == currentPhoto.url) {
+                            excludedPhotos.add(it)
+                            return@loop
+                        }
+                    }
+
+                }
+
+                if(carPhotos == uploadedPhotos){
+                    return
+                }
+
+                toBeDeletedPhotos.addAll(uploadedPhotos.minus(excludedPhotos))
+                toBeUploaded.addAll(carPhotos.minus(excludedPhotos))
+
+                if (toBeDeletedPhotos.isNotEmpty()) {
+                    toBeDeletedPhotos.forEach {
+                        photosRef.child(it.name.substringBefore(".")).removeValue()
+                        storageRef.getReference("car_photos/${it.name}")
+                            .delete()
                     }
                 }
+
+                if(toBeUploaded.isNotEmpty()){
+                    uploadPhotos(toBeUploaded)
+                    iAddEdit.onSuccess("Success!")
+                    return
+                }
+                iAddEdit.onSuccess("Success!")
             }
         })
 
+
+    }
+
+    private fun uploadPhotos(toBeUploaded: List<CarPhoto>) {
+        toBeUploaded.forEach {
+            storageRef.getReference("car_photos").child(it.name).putFile(Uri.parse(it.url))
+                .addOnSuccessListener { uploadTask ->
+
+                    val task: Task<Uri> = uploadTask.storage.downloadUrl
+
+                    while (!task.isSuccessful);
+                    val downloadUrl: Uri? = task.result
+
+                    it.url = downloadUrl.toString()
+                    photosRef.child(it.name.substringBefore(".")).setValue(it)
+
+                }
+        }
+    }
+
+    fun fetchRatings(postId: String, iRating: IRating) {
+        val query = ratingsRef.orderByChild("postId").equalTo(postId)
+
+        query.addValueEventListener(object : ValueEventListener {
+            override fun onCancelled(p0: DatabaseError) {
+                iRating.onErrorFetching(p0.message)
+            }
+
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val ratingsList = mutableListOf<Rating>()
+
+                for (item in snapshot.children) {
+                    val rating = item.getValue(Rating::class.java)
+                    ratingsList.add(rating!!)
+                }
+
+                iRating.onRatingsListFetched(ratingsList)
+            }
+        })
     }
 
     fun fetchPostRating(postId: String, iRatingInteraction: IRatingInteraction) {
@@ -138,27 +200,6 @@ class PostRepo {
 
     }
 
-    fun fetchRatings(postId: String, iRating: IRating) {
-        val query = ratingsRef.orderByChild("postId").equalTo(postId)
-
-        query.addValueEventListener(object : ValueEventListener {
-            override fun onCancelled(p0: DatabaseError) {
-                iRating.onErrorFetching(p0.message)
-            }
-
-            override fun onDataChange(snapshot: DataSnapshot) {
-                val ratingsList = mutableListOf<Rating>()
-
-                for (item in snapshot.children) {
-                    val rating = item.getValue(Rating::class.java)
-                    ratingsList.add(rating!!)
-                }
-
-                iRating.onRatingsListFetched(ratingsList)
-            }
-        })
-    }
-
     fun addRating(rating: Rating, iRatingInteraction: IRatingInteraction) {
         ratingsRef.child(rating.rateId).setValue(rating)
             .addOnCompleteListener {
@@ -172,6 +213,48 @@ class PostRepo {
             .addOnFailureListener {
                 iRatingInteraction.onErrorRating("Error adding a rating")
             }
+    }
+
+    private fun deleteRatings(postId: String) {
+
+        ratingsRef.orderByChild("postId").equalTo(postId)
+            .addValueEventListener(object : ValueEventListener {
+                override fun onCancelled(p0: DatabaseError) {
+                    // error
+                }
+
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    snapshot.children.forEach { it ->
+                        ratingsRef.child(it.child("rateId").value.toString()).removeValue()
+                    }
+
+                }
+            })
+    }
+
+    fun hasUserRated(postId: String, email: String, iRatingInteraction: IRatingInteraction) {
+
+        val query = ratingsRef.orderByChild("reviewerEmail").equalTo(email)
+
+        query.addValueEventListener(object : ValueEventListener {
+            override fun onCancelled(p0: DatabaseError) {
+                iRatingInteraction.onErrorRating(p0.message)
+            }
+
+            override fun onDataChange(snapshot: DataSnapshot) {
+
+                for (item in snapshot.children) {
+                    val currentRatePostId = item.child("postId").value.toString()
+                    if (postId == currentRatePostId) {
+                        // Success
+                        val currentRating = item.getValue(Rating::class.java)
+                        iRatingInteraction.onHasUserRated(currentRating!!)
+                        break
+                    }
+                }
+            }
+        })
+
     }
 
     fun retrievePhotos(postId: String, iPostPhotos: IPostPhotos) {
