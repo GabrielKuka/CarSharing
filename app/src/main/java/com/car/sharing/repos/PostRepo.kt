@@ -21,6 +21,8 @@ class PostRepo {
     internal val ratingsRef = dbRef.getReference("post_ratings")
     internal val currentUser = FirebaseAuth.getInstance().currentUser
 
+    // Delete post methods
+
     fun deletePost(postId: String, iPost: IPost) {
         dbRef.getReference("posts").child(postId).removeValue().addOnCompleteListener {
             if (!it.isSuccessful) {
@@ -31,17 +33,16 @@ class PostRepo {
             deleteRatings(postId)
             deletePostPhotos(postId)
 
-
+            iPost.onDeleteSuccess("Post Deleted!")
         }.addOnFailureListener {
             iPost.onDeleteError(it.message.toString())
         }
     }
 
-
     private fun deletePostPhotos(postId: String) {
         val photosNames = mutableListOf<String>()
         photosRef.orderByChild("postId").equalTo(postId)
-            .addValueEventListener(object : ValueEventListener {
+            .addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onCancelled(p0: DatabaseError) {
                     // error
                 }
@@ -65,6 +66,25 @@ class PostRepo {
             })
     }
 
+    private fun deleteRatings(postId: String) {
+
+        ratingsRef.orderByChild("postId").equalTo(postId)
+            .addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onCancelled(p0: DatabaseError) {
+                    // error
+                }
+
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    snapshot.children.forEach { it ->
+                        ratingsRef.child(it.child("rateId").value.toString()).removeValue()
+                    }
+
+                }
+            })
+    }
+
+
+    // Edit Post methods
 
     fun updatePost(post: Post, carPhotos: List<CarPhoto>, iAddEdit: IAddEdit) {
         val query = dbRef.getReference("posts").child(post.postId)
@@ -144,6 +164,8 @@ class PostRepo {
         }
     }
 
+
+
     fun fetchRatings(postId: String, iRating: IRating) {
         val query = ratingsRef.orderByChild("postId").equalTo(postId)
 
@@ -168,7 +190,7 @@ class PostRepo {
     fun fetchPostRating(postId: String, iRatingInteraction: IRatingInteraction) {
         val query = ratingsRef.orderByChild("postId").equalTo(postId)
 
-        query.addValueEventListener(object : ValueEventListener {
+        query.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onCancelled(p0: DatabaseError) {
                 iRatingInteraction.onErrorRating(p0.message)
             }
@@ -215,23 +237,6 @@ class PostRepo {
             }
     }
 
-    private fun deleteRatings(postId: String) {
-
-        ratingsRef.orderByChild("postId").equalTo(postId)
-            .addValueEventListener(object : ValueEventListener {
-                override fun onCancelled(p0: DatabaseError) {
-                    // error
-                }
-
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    snapshot.children.forEach { it ->
-                        ratingsRef.child(it.child("rateId").value.toString()).removeValue()
-                    }
-
-                }
-            })
-    }
-
     fun hasUserRated(postId: String, email: String, iRatingInteraction: IRatingInteraction) {
 
         val query = ratingsRef.orderByChild("reviewerEmail").equalTo(email)
@@ -261,7 +266,7 @@ class PostRepo {
 
         val query = photosRef.orderByChild("postId").equalTo(postId)
 
-        query.addValueEventListener(object : ValueEventListener {
+        query.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onCancelled(p0: DatabaseError) {
                 iPostPhotos.onErrorRetrieve(p0.message)
             }

@@ -125,6 +125,11 @@ class ViewPostFragment : Fragment(), IPostPhotos, IRatingInteraction,
         binder.photoViewPager.adapter = photoAdapter
     }
 
+    override fun onDeleteSuccess(msg: String) {
+        Quicktoast(requireContext()).sinfo(msg)
+        requireActivity().onBackPressed()
+    }
+
     override fun onAddedRating(msg: String) {
         Quicktoast(requireActivity()).sinfo(msg)
     }
@@ -149,8 +154,6 @@ class ViewPostFragment : Fragment(), IPostPhotos, IRatingInteraction,
         return when (item?.itemId) {
             R.id.delete_post_button -> {
                 BasicDialog("Are you sure you want to delete this post?") {
-                    requireActivity().supportFragmentManager.beginTransaction().detach(this)
-                        .commit()
                     postViewModel.deletePost(post.postId, this)
                 }.show(requireActivity().supportFragmentManager, "")
                 true

@@ -31,7 +31,7 @@ interface IAddEdit {
 }
 
 interface IPost {
-
+    fun onDeleteSuccess(msg: String)
     fun onDeleteError(msg: String)
 }
 
